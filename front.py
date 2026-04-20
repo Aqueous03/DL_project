@@ -21,7 +21,7 @@ def download_and_load_model():
 
     if not os.path.exists(model_path):
         with st.spinner("Загружаем модель с Google Диска... (это займёт ~1-2 минуты)"):
-            url = f"https://drive.google.com/uc?id={1UadDRyhUMw1oJXIzWONw2kjERhl0Xq7p}"
+            url = f"https://drive.google.com/uc?id={"1UadDRyhUMw1oJXIzWONw2kjERhl0Xq7p"}"
             gdown.download(url, model_path, quiet=False)
             st.success("Модель успешно загружена!")
 
