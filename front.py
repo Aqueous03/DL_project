@@ -48,7 +48,7 @@ if uploaded_file is not None:
         st.image(image, use_container_width=True)
 
     with st.spinner("Выполняется детекция..."):
-        results = model(img_array, conf=0.25)   # ← массив вместо файла
+        results = model(img_array, conf=0.25)   #массив
 
     result_img = draw_boxes(img_array.copy(), results, model.names)
 
