@@ -59,38 +59,32 @@ except Exception as e:
 uploaded_file = st.file_uploader("Выберите изображение", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert('RGB')
-    img_array = np.array(image)
+    image = Image.open(uploaded_file).convert("RGB")
+img_rgb = np.array(image)
+img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Исходное изображение")
-        st.image(image, use_container_width=True)
+...
 
-    with st.spinner("Выполняется детекция..."):
-        # Те же параметры, что в вашем локальном скрипте
-        results = model.predict(
-            source=img_array,
-            imgsz=416,
-            conf=0.25,
-            device='cpu',      # В Streamlit Cloud GPU обычно недоступен
-            save=False,        # Не сохраняем результаты на диск
-            verbose=False
-        )
+results = model.predict(
+    source=img_bgr,
+    imgsz=416,
+    conf=0.25,
+    device="cpu",
+    save=False,
+    verbose=False
+)
 
-    # Обработка результатов (точно как в вашем примере)
-    for r in results:
-        boxes = r.boxes
-        if boxes is not None:
-            result_img = draw_boxes(img_array.copy(), boxes, class_names)
-            counts = {}
-            for box in boxes:
-                cls_id = int(box.cls[0])
-                cls_name = class_names[cls_id]
-                counts[cls_name] = counts.get(cls_name, 0) + 1
-        else:
-            result_img = img_array.copy()
-            counts = {}
+result_img = img_bgr.copy()
+counts = {}
+
+for r in results:
+    boxes = r.boxes
+    if boxes is not None and len(boxes) > 0:
+        result_img = draw_boxes(img_bgr.copy(), boxes, class_names)
+        for box in boxes:
+            cls_id = int(box.cls[0])
+            cls_name = class_names[cls_id]
+            counts[cls_name] = counts.get(cls_name, 0) + 1
 
     with col2:
         st.subheader("Результат детекции")
