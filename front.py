@@ -7,23 +7,18 @@ import os
 import gdown
 
 # --- Конфигурация ---
-GOOGLE_DRIVE_FILE_ID = "1EXYJf7CHb2PrhHI_6Y8Hmshcl5cFnRn7"   # Ваш ID файла
+GOOGLE_DRIVE_FILE_ID = "1EXYJf7CHb2PrhHI_6Y8Hmshcl5cFnRn7"   #ID файла на Google Диске
 MODEL_FILENAME = "best.pt"
 
 @st.cache_resource
 def download_and_load_model():
-    """
-    Скачивает модель с Google Диска (если её нет локально)
-    и загружает её с помощью YOLO.
-    """
+    """Скачивает модель с Google Диска (если её нет локально) и загружает её."""
     model_path = MODEL_FILENAME
-
     if not os.path.exists(model_path):
         with st.spinner("Загружаем модель с Google Диска... (это займёт ~1-2 минуты)"):
-            url = f"https://drive.google.com/uc?id={"1EXYJf7CHb2PrhHI_6Y8Hmshcl5cFnRn7"}"
+            url = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
             gdown.download(url, model_path, quiet=False)
             st.success("Модель успешно загружена!")
-
     return YOLO(model_path)
 
 def draw_boxes(image, boxes, class_names):
@@ -73,22 +68,21 @@ if uploaded_file is not None:
         st.image(image, use_container_width=True)
 
     with st.spinner("Выполняется детекция..."):
-        # Используем метод predict с явными параметрами
+        # Те же параметры, что в вашем локальном скрипте
         results = model.predict(
             source=img_array,
             imgsz=416,
             conf=0.25,
-            device='cpu',          # Для Streamlit Cloud безопаснее CPU
+            device='cpu',      # В Streamlit Cloud GPU обычно недоступен
+            save=False,        # Не сохраняем результаты на диск
             verbose=False
         )
 
-    # Обрабатываем каждый результат (для одного изображения – один элемент)
+    # Обработка результатов (точно как в вашем примере)
     for r in results:
         boxes = r.boxes
         if boxes is not None:
-            # Рисуем боксы
             result_img = draw_boxes(img_array.copy(), boxes, class_names)
-            # Подсчёт объектов
             counts = {}
             for box in boxes:
                 cls_id = int(box.cls[0])
@@ -100,7 +94,6 @@ if uploaded_file is not None:
 
     with col2:
         st.subheader("Результат детекции")
-        # OpenCV возвращает BGR, поэтому указываем channels='BGR'
         st.image(result_img, use_container_width=True, channels="BGR")
 
     st.subheader("Найденные объекты:")
