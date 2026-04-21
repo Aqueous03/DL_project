@@ -6,4 +6,3 @@ ultralytics
 torch
 torchvision
 gdown
-cv2
