@@ -69,15 +69,14 @@ if uploaded_file is not None:
         st.image(image, use_container_width=True)
 
     with st.spinner("Выполняется детекция..."):
-        # Те же параметры, что в вашем локальном скрипте
         results = model.predict(
-        source=img_bgr,
-        imgsz=416,
-        conf=0.25,
-        device="cpu",
-        save=False,
-        verbose=False
-    )
+            source=img_bgr,
+            imgsz=416,
+            conf=0.15,
+            device="cpu",
+            save=False,
+            verbose=False
+        )
 
     result_img = img_bgr.copy()
     counts = {}
@@ -98,6 +97,6 @@ if uploaded_file is not None:
     st.subheader("Найденные объекты:")
     if counts:
         for name, cnt in counts.items():
-            st.write(f"- **{name}**: {cnt}")
+            st.write(f"- {name}: {cnt}")
     else:
         st.write("Объекты не обнаружены")
